@@ -134,8 +134,8 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 # venv\Scripts\activate   # Windows
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (full local development)
+pip install -r requirements-dev.txt
 
 # Download spaCy model (for sentence segmentation)
 python -m spacy download en_core_web_sm
@@ -241,7 +241,7 @@ This app is deployed live using [Streamlit Community Cloud](https://share.stream
 3. Go to [share.streamlit.io](https://share.streamlit.io) → "New app" → select your fork
 4. Set these:
    - **Main file path**: `app.py`
-   - **Requirements file**: `requirements-cloud.txt`
+   - **Python version**: `3.11`
 5. Add secrets in **Advanced settings** → **Secrets**:
    ```toml
    GROQ_API_KEY = "gsk_your_key_here"

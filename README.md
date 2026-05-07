@@ -1,26 +1,16 @@
 # Advanced RAG Pipeline for SEC Financial Filings
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://advanced-rag-pipeline.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://advanced-rag-pipeline-app-rohit.streamlit.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-grade Retrieval-Augmented Generation (RAG) system designed for processing complex, domain-specific documents — specifically SEC financial filings (10-K, 10-Q, 8-K). Unlike basic RAG implementations, this pipeline handles tables, images, multi-format documents, and implements advanced retrieval strategies with rigorous evaluation.
 
 ## 🚀 Live Demo
 
-**[▶️ Try the Live Web App](https://advanced-rag-pipeline.streamlit.app)**
+**[▶️ Try the Live Web App](https://advanced-rag-pipeline-app-rohit.streamlit.app)**
 
 Ask questions about SEC financial filings and watch the full RAG pipeline in action — including hybrid retrieval visualization, Reciprocal Rank Fusion scoring, and step-by-step latency metrics.
-
-## 📸 Screenshots
-
-| Pipeline Visualization | Retrieval Comparison |
-|:---:|:---:|
-| ![Pipeline Flow](assets/screenshots/pipeline_flow.png) | ![Retrieval Comparison](assets/screenshots/retrieval_comparison.png) |
-
-| RRF Fusion Breakdown | Generated Answer |
-|:---:|:---:|
-| ![RRF Fusion](assets/screenshots/rrf_fusion.png) | ![Answer Generation](assets/screenshots/answer_generation.png) |
 
 ## Key Features
 

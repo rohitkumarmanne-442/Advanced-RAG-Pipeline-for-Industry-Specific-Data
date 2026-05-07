@@ -1,9 +1,26 @@
 # Advanced RAG Pipeline for SEC Financial Filings
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://advanced-rag-pipeline.streamlit.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A production-grade Retrieval-Augmented Generation (RAG) system designed for processing complex, domain-specific documents — specifically SEC financial filings (10-K, 10-Q, 8-K). Unlike basic RAG implementations, this pipeline handles tables, images, multi-format documents, and implements advanced retrieval strategies with rigorous evaluation.
+
+## 🚀 Live Demo
+
+**[▶️ Try the Live Web App](https://advanced-rag-pipeline.streamlit.app)**
+
+Ask questions about SEC financial filings and watch the full RAG pipeline in action — including hybrid retrieval visualization, Reciprocal Rank Fusion scoring, and step-by-step latency metrics.
+
+## 📸 Screenshots
+
+| Pipeline Visualization | Retrieval Comparison |
+|:---:|:---:|
+| ![Pipeline Flow](assets/screenshots/pipeline_flow.png) | ![Retrieval Comparison](assets/screenshots/retrieval_comparison.png) |
+
+| RRF Fusion Breakdown | Generated Answer |
+|:---:|:---:|
+| ![RRF Fusion](assets/screenshots/rrf_fusion.png) | ![Answer Generation](assets/screenshots/answer_generation.png) |
 
 ## Key Features
 
@@ -214,6 +231,35 @@ Domain adaptation using Multiple Negatives Ranking Loss:
 - **Document Processing**: Unstructured, PyMuPDF, Camelot
 - **Evaluation**: Ragas
 - **Framework**: PyTorch
+
+## Cloud Deployment (Streamlit Community Cloud)
+
+This app is deployed live using [Streamlit Community Cloud](https://share.streamlit.io) with Groq's free LLM API:
+
+1. Fork this repository
+2. Sign up at [Groq Console](https://console.groq.com/) and get a free API key
+3. Go to [share.streamlit.io](https://share.streamlit.io) → "New app" → select your fork
+4. Set these:
+   - **Main file path**: `app.py`
+   - **Requirements file**: `requirements-cloud.txt`
+5. Add secrets in **Advanced settings** → **Secrets**:
+   ```toml
+   GROQ_API_KEY = "gsk_your_key_here"
+   STREAMLIT_CLOUD = "true"
+   ```
+6. Deploy!
+
+The cloud version uses **Groq API** (Llama 3.1 8B) instead of local Ollama — same pipeline, same retrieval logic, just a different LLM backend.
+
+## Web App (Local)
+
+```bash
+# Run with local Ollama
+streamlit run app.py
+
+# Or run with Groq API (no Ollama needed)
+GROQ_API_KEY=gsk_your_key streamlit run app.py
+```
 
 ## Resume Bullet Points
 

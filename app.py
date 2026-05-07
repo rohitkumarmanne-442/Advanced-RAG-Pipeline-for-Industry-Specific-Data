@@ -12,6 +12,7 @@ Streamlit-based interface that visualizes the entire RAG pipeline process:
 import streamlit as st
 import time
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -23,6 +24,22 @@ from loguru import logger
 
 # Suppress loguru output in web app
 logger.remove()
+
+# Detect cloud deployment
+IS_CLOUD = os.environ.get("STREAMLIT_CLOUD", "false").lower() == "true" or os.environ.get("GROQ_API_KEY", "") != ""
+
+# Load secrets from Streamlit Cloud if available
+try:
+    if hasattr(st, "secrets"):
+        if "GROQ_API_KEY" in st.secrets:
+            os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+            IS_CLOUD = True
+        if "STREAMLIT_CLOUD" in st.secrets:
+            IS_CLOUD = True
+except Exception:
+    pass
+
+CONFIG_PATH = "config/settings_cloud.yaml" if IS_CLOUD else "config/settings.yaml"
 
 # ─── Page Configuration ───────────────────────────────────────────────────────
 
@@ -127,7 +144,7 @@ def load_pipeline():
     """Load and initialize the RAG pipeline (cached across reruns)."""
     from src.pipeline.rag_pipeline import RAGPipeline
 
-    pipeline = RAGPipeline(config_path="config/settings.yaml")
+    pipeline = RAGPipeline(config_path=CONFIG_PATH)
     pipeline.initialize()
     return pipeline
 
@@ -220,7 +237,7 @@ with st.sidebar:
 
     # Load config
     import yaml
-    with open("config/settings.yaml", "r") as f:
+    with open(CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
 
     st.markdown("**Embedding Model**")
@@ -265,6 +282,9 @@ st.markdown(
     '<p class="sub-header">Production-grade Retrieval-Augmented Generation for SEC Financial Filings</p>',
     unsafe_allow_html=True,
 )
+
+if IS_CLOUD:
+    st.caption("☁️ Running on Streamlit Cloud with Groq API (Llama 3.1 8B) • [GitHub Repo](https://github.com/rohitkumarmanne-442/Advanced-RAG-Pipeline-for-Industry-Specific-Data)")
 
 # Pipeline flow visualization
 st.markdown("""

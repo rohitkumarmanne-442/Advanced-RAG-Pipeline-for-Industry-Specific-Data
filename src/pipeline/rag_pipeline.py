@@ -124,7 +124,20 @@ class RAGPipeline:
 
         # Configure LLM
         llm_config = self.config.get("llm", {})
-        if llm_config.get("provider") == "huggingface":
+        provider = llm_config.get("provider", "ollama")
+
+        if provider == "groq":
+            import os
+            from llama_index.llms.groq import Groq
+
+            api_key = os.environ.get("GROQ_API_KEY", llm_config.get("api_key", ""))
+            Settings.llm = Groq(
+                model=llm_config.get("model_name", "llama-3.1-8b-instant"),
+                api_key=api_key,
+                temperature=llm_config.get("temperature", 0.1),
+                max_tokens=llm_config.get("max_tokens", 2048),
+            )
+        elif provider == "huggingface":
             from llama_index.llms.huggingface import HuggingFaceLLM
 
             Settings.llm = HuggingFaceLLM(
@@ -135,7 +148,7 @@ class RAGPipeline:
                 generate_kwargs={"temperature": llm_config.get("temperature", 0.1)},
                 device_map="auto",
             )
-        elif llm_config.get("provider") == "ollama":
+        elif provider == "ollama":
             from llama_index.llms.ollama import Ollama
 
             Settings.llm = Ollama(

@@ -64,7 +64,6 @@ ENV/
 
 # Project specific
 data/vectorstore/
-data/raw/
 data/processed/
 models/
 logs/

@@ -1,0 +1,58 @@
+[
+  {
+    "content": "ITEM 1. BUSINESS\n\nThe Company designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories, and sells a variety of related services. The Company's fiscal year is the 52- or 53-week period that ends on the last Saturday of September.\n\nProducts\n\nThe Company's products include iPhone, Mac, iPad, and Wearables, Home and Accessories. iPhone is the Company's line of smartphones based on its iOS operating system. Mac is the Company's line of personal computers based on its macOS operating system. iPad is the Company's line of multi-purpose tablets based on its iPadOS operating system.",
+    "section": "Business Overview",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "ITEM 1A. RISK FACTORS\n\nThe Company's operations and performance depend significantly on global and regional economic conditions and adverse macroeconomic conditions, including inflation, slower growth or recession, new or increased tariffs, changes to fiscal and monetary policy, tighter credit, higher interest rates, high unemployment and currency fluctuations, could materially adversely affect demand for the Company's products and services.\n\nThe Company's business can be impacted by political events, trade and other international disputes, geopolitical tensions, conflict, terrorism, natural disasters, public health issues, industrial accidents, and other business interruptions.",
+    "section": "Risk Factors",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "ITEM 6. SELECTED FINANCIAL DATA\n\nTotal net revenue for fiscal year 2023 was $383,285 million compared to $394,328 million in fiscal year 2022, representing a decrease of approximately 3%. The decrease was primarily driven by lower iPhone and Mac revenue, partially offset by higher Services revenue.\n\nGross margin was 44.1% in fiscal 2023 compared to 43.3% in fiscal 2022. The year-over-year increase in gross margin was primarily driven by cost savings and a favorable shift in mix toward Services.",
+    "section": "Financial Data",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "ITEM 7. MANAGEMENT'S DISCUSSION AND ANALYSIS\n\nResearch and Development\n\nResearch and development expenses were $29,915 million in 2023 compared to $26,251 million in 2022, an increase of $3,664 million or 14%. The increase was primarily driven by increases in headcount-related expenses. The Company continues to believe that focused investments in R&D are critical to its future growth and competitive position in the marketplace, and to the development of new and updated products and services that are central to the Company's core business strategy.",
+    "section": "MD&A",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "ITEM 8. FINANCIAL STATEMENTS\n\nConsolidated Statements of Operations (in millions):\n\nNet sales - Products: $298,085 (2023), $316,199 (2022), $297,392 (2021)\nNet sales - Services: $85,200 (2023), $78,129 (2022), $68,425 (2021)\nTotal net sales: $383,285 (2023), $394,328 (2022), $365,817 (2021)\n\nCost of sales - Products: $214,137 (2023), $223,546 (2022), $192,266 (2021)\nCost of sales - Services: $24,855 (2023), $22,075 (2022), $20,715 (2021)\nTotal cost of sales: $238,992 (2023), $245,621 (2022), $212,981 (2021)\n\nGross margin: $144,293 (2023), $148,707 (2022), $152,836 (2021)",
+    "section": "Financial Statements",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "During 2023, the Company completed various business acquisitions for an aggregate cash consideration of $2.1 billion, net of cash acquired. These acquisitions were not individually or in the aggregate material to the Company's consolidated financial statements. The largest acquisition was a semiconductor design company valued at approximately $800 million, aimed at strengthening the Company's custom silicon design capabilities for future product generations.",
+    "section": "Acquisitions",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "Quarterly Financial Performance:\n\nQ4 2023: Revenue $89.5B, Gross Margin 45.2%, Operating Income $27.0B\nQ3 2023: Revenue $81.8B, Gross Margin 44.5%, Operating Income $23.2B\nQ2 2023: Revenue $94.8B, Gross Margin 44.3%, Operating Income $28.3B\nQ1 2023: Revenue $117.2B, Gross Margin 43.0%, Operating Income $36.0B\n\nServices revenue grew 16% year-over-year in Q4 2023, reaching $22.3 billion. The Services segment contributed to margin expansion due to its higher gross margin profile compared to hardware products.",
+    "section": "Quarterly Data",
+    "filing_type": "10-Q",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  },
+  {
+    "content": "Supply Chain and Manufacturing:\n\nThe Company's supply chain is concentrated in specific geographic regions, particularly East Asia. The Company relies on single-source suppliers for certain critical components including advanced semiconductor chips, OLED displays, and specialized sensors. Disruptions from geopolitical tensions, particularly in the Taiwan Strait region, represent a material risk to manufacturing continuity. Additionally, the global semiconductor shortage cycles have historically impacted production timelines by 4-8 weeks during peak constraint periods.",
+    "section": "Risk Factors - Supply Chain",
+    "filing_type": "10-K",
+    "company_name": "Apple Inc.",
+    "filing_date": "2023-11-03"
+  }
+]

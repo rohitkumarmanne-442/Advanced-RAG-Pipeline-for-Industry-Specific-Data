@@ -1,0 +1,111 @@
+# Advanced RAG Pipeline Configuration
+# Domain: SEC Financial Filings
+
+project:
+  name: "Advanced RAG Pipeline"
+  domain: "financial"  # Options: financial, legal, medical
+  version: "1.0.0"
+
+# Document Ingestion Settings
+ingestion:
+  supported_formats: [".pdf", ".txt", ".html", ".json"]
+  pdf_parser: "unstructured"  # Options: unstructured, pymupdf, camelot
+  extract_tables: true
+  extract_images: true
+  ocr_enabled: true
+  max_file_size_mb: 100
+
+# Chunking Configuration
+chunking:
+  strategy: "semantic"  # Options: semantic, recursive, hybrid
+  semantic:
+    embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+    breakpoint_threshold: 0.3
+    min_chunk_size: 100
+    max_chunk_size: 1500
+  recursive:
+    chunk_size: 512
+    chunk_overlap: 50
+    separators: ["\n\n", "\n", ". ", " "]
+  hybrid:
+    primary_strategy: "semantic"
+    fallback_strategy: "recursive"
+    table_chunk_strategy: "preserve_complete"
+
+# Embedding Configuration
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  model_kwargs:
+    device: "cpu"
+  encode_kwargs:
+    normalize_embeddings: true
+    batch_size: 32
+  dimension: 384
+  fine_tune:
+    enabled: false
+    training_data: "data/fine_tune/triplets.json"
+    epochs: 5
+    learning_rate: 2.0e-5
+    warmup_steps: 100
+
+# Vector Store Configuration
+vectorstore:
+  backend: "chroma"  # Options: chroma, faiss
+  chroma:
+    collection_name: "sec_filings"
+    persist_directory: "data/vectorstore/chroma"
+    distance_metric: "cosine"
+  faiss:
+    index_type: "IVFFlat"  # Options: Flat, IVFFlat, IVFPQ, HNSW
+    nlist: 100
+    nprobe: 10
+    persist_path: "data/vectorstore/faiss"
+
+# Retrieval Configuration
+retrieval:
+  top_k: 10
+  final_top_k: 5
+  strategies:
+    - "dense"
+    - "sparse"
+  fusion:
+    method: "reciprocal_rank"  # Options: reciprocal_rank, weighted, relative_score
+    rrf_k: 60
+    weights:
+      dense: 0.7
+      sparse: 0.3
+  reranker:
+    enabled: false
+    model: "BAAI/bge-reranker-large"
+    top_n: 5
+
+# LLM Configuration
+llm:
+  provider: "ollama"  # Options: huggingface, openai, ollama
+  model_name: "llama3.2:3b"
+  temperature: 0.1
+  max_tokens: 2048
+  context_window: 4096
+  system_prompt: |
+    You are a financial analyst assistant specializing in SEC filings analysis.
+    Answer questions based strictly on the provided context.
+    If the information is not in the context, say "I cannot find this information in the provided documents."
+    Always cite the specific section or document you're referencing.
+
+# Evaluation Configuration
+evaluation:
+  framework: "ragas"
+  metrics:
+    - "faithfulness"
+    - "answer_relevancy"
+    - "context_precision"
+    - "context_recall"
+  ground_truth_path: "data/ground_truth/qa_pairs.json"
+  num_samples: 50
+  hallucination_threshold: 0.05
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

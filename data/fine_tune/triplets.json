@@ -1,0 +1,27 @@
+[
+  {
+    "query": "What is the company's total net revenue?",
+    "positive": "Total net revenue for fiscal year 2023 was $383,285 million compared to $394,328 million in fiscal year 2022, representing a decrease of approximately 3%.",
+    "negative": "The Company designs, manufactures and markets smartphones, personal computers, tablets, wearables and accessories."
+  },
+  {
+    "query": "What were the R&D expenses?",
+    "positive": "Research and development expenses were $29,915 million in 2023 compared to $26,251 million in 2022, an increase of $3,664 million or 14%.",
+    "negative": "The Company's supply chain is concentrated in specific geographic regions, particularly East Asia."
+  },
+  {
+    "query": "What supply chain risks does the company face?",
+    "positive": "The Company relies on single-source suppliers for certain critical components including advanced semiconductor chips, OLED displays, and specialized sensors.",
+    "negative": "Gross margin was 44.1% in fiscal 2023 compared to 43.3% in fiscal 2022."
+  },
+  {
+    "query": "What acquisitions were made in 2023?",
+    "positive": "During 2023, the Company completed various business acquisitions for an aggregate cash consideration of $2.1 billion, net of cash acquired.",
+    "negative": "iPhone is the Company's line of smartphones based on its iOS operating system."
+  },
+  {
+    "query": "How did services revenue perform?",
+    "positive": "Services revenue grew 16% year-over-year in Q4 2023, reaching $22.3 billion. The Services segment contributed to margin expansion.",
+    "negative": "The Company's operations and performance depend significantly on global and regional economic conditions."
+  }
+]

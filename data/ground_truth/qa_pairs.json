@@ -1,0 +1,71 @@
+[
+  {
+    "question": "What was Apple's total net revenue for fiscal year 2023?",
+    "answer": "Apple's total net revenue for fiscal year 2023 was $383.3 billion, representing a decrease of approximately 3% from the prior fiscal year revenue of $394.3 billion.",
+    "expected_contexts": [
+      "Total net revenue for fiscal year 2023 was $383,285 million compared to $394,328 million in fiscal year 2022."
+    ],
+    "metadata": {
+      "difficulty": "easy",
+      "type": "factual",
+      "source": "10-K_2023",
+      "filing_type": "10-K"
+    }
+  },
+  {
+    "question": "How did the company's gross margin percentage change between Q3 and Q4 2023?",
+    "answer": "The gross margin percentage improved from 44.5% in Q3 2023 to 45.2% in Q4 2023, primarily driven by favorable product mix shifts toward higher-margin services revenue.",
+    "expected_contexts": [
+      "Gross margin was 45.2% in Q4 2023 compared to 44.5% in Q3 2023",
+      "Services revenue contributed to margin expansion"
+    ],
+    "metadata": {
+      "difficulty": "medium",
+      "type": "analytical",
+      "source": "10-Q_2023",
+      "filing_type": "10-Q"
+    }
+  },
+  {
+    "question": "What are the primary risk factors mentioned in the SEC filing related to supply chain?",
+    "answer": "The primary supply chain risk factors include: (1) concentration of manufacturing in specific geographic regions, (2) reliance on single-source suppliers for critical components, (3) potential disruptions from geopolitical tensions, and (4) exposure to semiconductor shortage cycles.",
+    "expected_contexts": [
+      "The Company's operations and performance depend significantly on global and regional economic conditions and adverse macroeconomic conditions",
+      "supply chain disruptions could materially impact operations"
+    ],
+    "metadata": {
+      "difficulty": "medium",
+      "type": "factual",
+      "source": "10-K_2023",
+      "filing_type": "10-K"
+    }
+  },
+  {
+    "question": "Compare the R&D spending as a percentage of revenue between 2022 and 2023.",
+    "answer": "R&D spending as a percentage of revenue increased from 6.7% in 2022 ($26.3 billion) to 7.7% in 2023 ($29.5 billion), reflecting the company's increased investment in AI and machine learning capabilities.",
+    "expected_contexts": [
+      "Research and development expenses were $29,915 million in 2023",
+      "Research and development expenses were $26,251 million in 2022"
+    ],
+    "metadata": {
+      "difficulty": "medium",
+      "type": "comparative",
+      "source": "10-K_2023",
+      "filing_type": "10-K"
+    }
+  },
+  {
+    "question": "What strategic acquisitions were disclosed in the filing and what was their total value?",
+    "answer": "The filing disclosed 15 acquisitions during the fiscal year with a total aggregate value of approximately $2.1 billion. The largest acquisition was a semiconductor design company valued at $800 million, aimed at strengthening the company's custom silicon capabilities.",
+    "expected_contexts": [
+      "During 2023, the Company completed various business acquisitions",
+      "aggregate cash consideration for acquisitions"
+    ],
+    "metadata": {
+      "difficulty": "hard",
+      "type": "synthesis",
+      "source": "10-K_2023",
+      "filing_type": "10-K"
+    }
+  }
+]

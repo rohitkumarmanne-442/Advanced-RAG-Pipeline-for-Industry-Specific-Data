@@ -1,0 +1,19 @@
+All 18 tests passed. Here's a quick reference:
+
+Command	What it tests
+python -m pytest tests/ -v	All tests
+python -m pytest test_chunking.py -v	Chunking strategies only
+python -m pytest test_retrieval.py -v	Retrieval + RRF only
+python -m pytest test_pipeline.py -v	Pipeline integration only
+
+
+
+For querying the live pipeline:
+# Single question
+& .venv/Scripts/python.exe scripts/run_pipeline.py --query "What are the supply chain risks?"
+
+# Interactive mode (ask multiple questions)
+& .venv/Scripts/python.exe scripts/run_pipeline.py --interactive
+
+# For Webapp
+& .venv/Scripts/streamlit.exe run app.py

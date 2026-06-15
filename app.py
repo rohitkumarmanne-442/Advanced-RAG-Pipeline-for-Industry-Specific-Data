@@ -487,22 +487,7 @@ import yaml
 with open(CONFIG_PATH, "r") as f:
     config = yaml.safe_load(f)
 
-# Page routing: a dedicated sidebar selector lets users hop between the
-# main RAG pipeline view and the new Contact Us form.
-PAGE_PIPELINE = "⚡ RAG Pipeline"
-PAGE_CONTACT = "✉️ Contact Us"
-
 with st.sidebar:
-    st.markdown("## 🧭 Navigation")
-    selected_page = st.radio(
-        "Go to",
-        options=[PAGE_PIPELINE, PAGE_CONTACT],
-        index=0,
-        label_visibility="collapsed",
-        key="nav_page",
-    )
-    st.markdown("---")
-
     st.markdown("## ⚡ Pipeline Config")
 
     st.markdown(f"""
@@ -542,24 +527,20 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Initialize pipeline only when the pipeline page is active; the
-    # contact page doesn't need the heavy RAG components loaded, but we
-    # keep the existing behavior for the pipeline view unchanged.
-    pipeline = None
-    if selected_page == PAGE_PIPELINE:
-        with st.spinner("Initializing pipeline..."):
-            try:
-                pipeline = load_pipeline()
-                num_chunks = ingest_documents(pipeline)
-                stats = pipeline.get_pipeline_stats()
-                doc_count = stats.get("vector_store", {}).get("document_count", 0)
-                st.success(f"Pipeline ready")
-                col_a, col_b = st.columns(2)
-                col_a.metric("Chunks", num_chunks)
-                col_b.metric("Documents", doc_count)
-            except Exception as e:
-                st.error(f"Pipeline error: {str(e)[:80]}")
-                pipeline = None
+    # Initialize pipeline
+    with st.spinner("Initializing pipeline..."):
+        try:
+            pipeline = load_pipeline()
+            num_chunks = ingest_documents(pipeline)
+            stats = pipeline.get_pipeline_stats()
+            doc_count = stats.get("vector_store", {}).get("document_count", 0)
+            st.success(f"Pipeline ready")
+            col_a, col_b = st.columns(2)
+            col_a.metric("Chunks", num_chunks)
+            col_b.metric("Documents", doc_count)
+        except Exception as e:
+            st.error(f"Pipeline error: {str(e)[:80]}")
+            pipeline = None
 
     st.markdown("---")
     st.markdown("##### Built by [Rohit Manne](https://github.com/rohitkumarmanne-442)")
@@ -567,28 +548,6 @@ with st.sidebar:
         st.caption("☁️ Cloud mode (Groq API)")
     else:
         st.caption("🖥️ Local mode (Ollama)")
-
-
-# ─── Page Routing ─────────────────────────────────────────────────────────────
-
-if selected_page == PAGE_CONTACT:
-    from src.contact_form import render_contact_page
-
-    render_contact_page()
-
-    # Lightweight footer for the contact page so the look stays consistent.
-    st.markdown("""
-    <div class="footer">
-        <div class="footer-text">
-            <strong>Advanced RAG Pipeline</strong> &mdash; We typically reply within 2 business days.
-        </div>
-        <div class="footer-links">
-            <a class="footer-link" href="https://github.com/rohitkumarmanne-442/Advanced-RAG-Pipeline-for-Industry-Specific-Data" target="_blank">GitHub Repository</a>
-            <a class="footer-link" href="https://github.com/rohitkumarmanne-442" target="_blank">About the Author</a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.stop()
 
 
 # ─── Hero Section ────────────────────────────────────────────────────────────

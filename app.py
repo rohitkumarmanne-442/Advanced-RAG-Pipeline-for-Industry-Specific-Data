@@ -8,6 +8,9 @@ import time
 import json
 import os
 import sys
+import csv
+import re
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -390,6 +393,76 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# ─── Contact Form Helpers ─────────────────────────────────────────────────────
+
+CONTACTS_CSV = Path("data/contacts.csv")
+CONTACTS_FIELDNAMES = ["timestamp", "name", "email", "message"]
+CONTACT_MAILTO = "rohitkumarmanne@example.com"  # update to real address as needed
+
+
+def _is_valid_email(email: str) -> bool:
+    """Return True if *email* contains '@' and at least one '.' after the '@'."""
+    at_pos = email.find("@")
+    if at_pos < 1:
+        return False
+    domain_part = email[at_pos + 1:]
+    return "." in domain_part and len(domain_part) > 2
+
+
+def _append_contact_csv(name: str, email: str, message: str) -> None:
+    """Append a contact submission row to data/contacts.csv (local mode only)."""
+    try:
+        CONTACTS_CSV.parent.mkdir(parents=True, exist_ok=True)
+        write_header = not CONTACTS_CSV.exists() or CONTACTS_CSV.stat().st_size == 0
+        with open(CONTACTS_CSV, "a", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(fh, fieldnames=CONTACTS_FIELDNAMES)
+            if write_header:
+                writer.writeheader()
+            writer.writerow({
+                "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+                "name": name,
+                "email": email,
+                "message": message,
+            })
+    except OSError:
+        # On read-only file systems (e.g. some cloud sandboxes) silently skip.
+        pass
+
+
+def _handle_contact_submit() -> None:
+    """Validate and process the contact form submission."""
+    name = st.session_state.get("contact_name", "").strip()
+    email = st.session_state.get("contact_email", "").strip()
+    message = st.session_state.get("contact_message", "").strip()
+
+    # Validation
+    if not name or not email or not message:
+        st.session_state["contact_status"] = ("error", "Please fill in all fields.")
+        return
+
+    if not _is_valid_email(email):
+        st.session_state["contact_status"] = ("error", "Please enter a valid email address.")
+        return
+
+    # Persist
+    if "contact_submissions" not in st.session_state:
+        st.session_state["contact_submissions"] = []
+    st.session_state["contact_submissions"].append({
+        "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "name": name,
+        "email": email,
+        "message": message,
+    })
+
+    _append_contact_csv(name, email, message)
+
+    # Clear fields
+    st.session_state["contact_name"] = ""
+    st.session_state["contact_email"] = ""
+    st.session_state["contact_message"] = ""
+    st.session_state["contact_status"] = ("success", "✅ Message sent! We'll be in touch.")
+
+
 # ─── Pipeline State Management ────────────────────────────────────────────────
 
 @st.cache_resource
@@ -548,6 +621,57 @@ with st.sidebar:
         st.caption("☁️ Cloud mode (Groq API)")
     else:
         st.caption("🖥️ Local mode (Ollama)")
+
+    # ─── Contact Us ───────────────────────────────────────────────────────
+    st.markdown("---")
+
+    # Initialise session-state keys on first load
+    for _key in ("contact_name", "contact_email", "contact_message"):
+        if _key not in st.session_state:
+            st.session_state[_key] = ""
+    if "contact_status" not in st.session_state:
+        st.session_state["contact_status"] = None
+
+    with st.expander("✉️ Contact Us", expanded=False):
+        # Show previous submission status banner
+        _status = st.session_state.get("contact_status")
+        if _status is not None:
+            _kind, _msg = _status
+            if _kind == "success":
+                st.success(_msg)
+            else:
+                st.error(_msg)
+
+        st.text_input(
+            "Name",
+            key="contact_name",
+            placeholder="Your name",
+        )
+        st.text_input(
+            "Email",
+            key="contact_email",
+            placeholder="you@example.com",
+        )
+        st.text_area(
+            "Message",
+            key="contact_message",
+            placeholder="How can we help?",
+            height=120,
+        )
+
+        st.button(
+            "Submit",
+            on_click=_handle_contact_submit,
+            use_container_width=True,
+            type="primary",
+        )
+
+        # Mailto fallback — always visible
+        st.markdown(
+            f'<a href="mailto:{CONTACT_MAILTO}" style="font-size:0.82rem;">'
+            f"Or email us directly</a>",
+            unsafe_allow_html=True,
+        )
 
 
 # ─── Hero Section ────────────────────────────────────────────────────────────

@@ -18,6 +18,9 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
+from src.contact import handle_contact_submission
+from src.contact.handler import is_valid_email
+
 # Suppress loguru output in web app
 logger.remove()
 
@@ -281,6 +284,7 @@ st.markdown("""
     .section-icon.green { background: #d1fae5; }
     .section-icon.blue { background: #dbeafe; }
     .section-icon.pink { background: #fce7f3; }
+    .section-icon.amber { background: #fef3c7; }
     .section-title {
         font-size: 1.3rem;
         font-weight: 700;
@@ -317,6 +321,22 @@ st.markdown("""
         border-radius: 12px;
         padding: 1.2rem 1.5rem;
         margin: 1rem 0;
+    }
+
+    /* Contact card — reuses source-card visual tokens */
+    .contact-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem 1.75rem;
+        margin: 0.7rem 0 1.2rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .contact-intro {
+        color: #475569;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 0.6rem;
     }
 
     /* Footer */
@@ -852,6 +872,96 @@ if search_clicked and query and pipeline:
 
 elif search_clicked and not query:
     st.warning("Please enter a question to search.")
+
+# ─── Contact Us Section ──────────────────────────────────────────────────────
+#
+# Embedded below the RRF / context blocks and above the footer. Form state
+# lives in ``st.session_state`` so it survives Streamlit's per-interaction
+# reruns and we can clear inputs after a successful send. The actual delivery
+# is delegated to ``src.contact.handle_contact_submission`` (stub today,
+# real implementation in Story 2) so this section works identically in
+# local (Ollama) and cloud (Groq) modes.
+
+_CONTACT_KEYS = ("contact_name", "contact_email", "contact_message")
+for _k in _CONTACT_KEYS:
+    st.session_state.setdefault(_k, "")
+st.session_state.setdefault("contact_status", None)  # ("success"|"error", msg)
+
+st.markdown("""
+<div class="section-header">
+    <div class="section-icon amber">✉️</div>
+    <div class="section-title">Contact Us</div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="contact-card">
+    <div class="contact-intro">
+        Questions, feedback, or interested in collaborating? Drop a note below and the author will get back to you.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+_c_left, _c_right = st.columns(2)
+with _c_left:
+    st.text_input("Name", key="contact_name", placeholder="Jane Doe")
+with _c_right:
+    st.text_input("Email", key="contact_email", placeholder="jane@example.com")
+
+st.text_area(
+    "Message",
+    key="contact_message",
+    placeholder="Tell us what's on your mind...",
+    height=140,
+)
+
+_name_val = (st.session_state.get("contact_name") or "").strip()
+_email_val = (st.session_state.get("contact_email") or "").strip()
+_message_val = (st.session_state.get("contact_message") or "").strip()
+
+# Inline hint for a clearly malformed email (Scenario 3). We only warn once
+# the user has typed something — we don't yell at empty fields.
+if _email_val and "@" not in _email_val:
+    st.caption("⚠️ Email address looks invalid — please include an '@'.")
+
+_can_submit = bool(_name_val) and bool(_message_val) and ("@" in _email_val)
+
+_submit_clicked = st.button(
+    "Send message",
+    type="primary",
+    disabled=not _can_submit,
+    key="contact_submit",
+)
+
+if _submit_clicked and _can_submit:
+    try:
+        # Defence-in-depth: the handler re-validates server-side.
+        if not is_valid_email(_email_val):
+            raise ValueError("Email address looks invalid.")
+        handle_contact_submission(_name_val, _email_val, _message_val)
+    except ValueError as ve:
+        # Inputs preserved; show friendly validation message.
+        st.session_state["contact_status"] = ("error", str(ve))
+    except Exception as ex:  # noqa: BLE001 — handler may raise anything
+        logger.exception("Contact submission failed")
+        st.session_state["contact_status"] = (
+            "error",
+            "Sorry — we couldn't send your message right now. Please try again later.",
+        )
+    else:
+        # Clear inputs on success (Scenario 1).
+        for _k in _CONTACT_KEYS:
+            st.session_state[_k] = ""
+        st.session_state["contact_status"] = ("success", "Message sent! Thanks for reaching out.")
+        st.rerun()
+
+_status = st.session_state.get("contact_status")
+if _status:
+    _kind, _msg = _status
+    if _kind == "success":
+        st.success(_msg)
+    else:
+        st.error(_msg)
 
 # ─── Footer ──────────────────────────────────────────────────────────────────
 

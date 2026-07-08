@@ -69,12 +69,17 @@ st.markdown("""
         --text-primary: #f8fafc;
         --text-secondary: #94a3b8;
         --border: #334155;
+        --radius-sm: 12px;
+        --radius-lg: 16px;
     }
+
+    /* Base line-height bump for readability */
+    html, body, [class*="css"] { line-height: 1.75; }
 
     /* Main header styling */
     .hero-container {
         text-align: center;
-        padding: 2rem 1rem 1rem;
+        padding: 1.25rem 1rem 0.75rem;
     }
     .hero-title {
         font-size: 2.8rem;
@@ -83,28 +88,62 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.25rem;
         letter-spacing: -0.02em;
+        line-height: 1.15;
     }
     .hero-subtitle {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         color: #64748b;
         font-weight: 400;
         margin-bottom: 0.5rem;
+        line-height: 1.5;
     }
+
+    /* Hero badge — animated shimmer gradient */
     .hero-badge {
+        position: relative;
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
-        padding: 0.35rem 0.9rem;
+        padding: 0.4rem 1rem;
         border-radius: 50px;
         font-size: 0.75rem;
         font-weight: 600;
         letter-spacing: 0.03em;
         text-transform: uppercase;
-        margin-top: 0.5rem;
+        margin-top: 0.35rem;
+        background: linear-gradient(120deg,
+            #6366f1 0%, #8b5cf6 25%, #ec4899 50%, #8b5cf6 75%, #6366f1 100%);
+        background-size: 300% 100%;
+        animation: hero-shimmer 3.5s linear infinite;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .hero-badge::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50px;
+        padding: 1px;
+        background: linear-gradient(120deg,
+            rgba(255,255,255,0.6), rgba(255,255,255,0) 40%,
+            rgba(255,255,255,0) 60%, rgba(255,255,255,0.6));
+        background-size: 200% 100%;
+        animation: hero-badge-sheen 2.5s ease-in-out infinite;
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+                mask-composite: exclude;
+        pointer-events: none;
+    }
+    @keyframes hero-shimmer {
+        0%   { background-position: 0% 50%; }
+        100% { background-position: 300% 50%; }
+    }
+    @keyframes hero-badge-sheen {
+        0%   { background-position: -100% 0; }
+        60%  { background-position: 200% 0; }
+        100% { background-position: 200% 0; }
     }
 
     /* Pipeline flow */
@@ -126,7 +165,7 @@ st.markdown("""
         background: white;
         border: 1px solid #e2e8f0;
         padding: 0.6rem 1.1rem;
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 0.82rem;
         font-weight: 600;
         color: #475569;
@@ -151,6 +190,8 @@ st.markdown("""
         grid-template-columns: repeat(5, 1fr);
         gap: 0.8rem;
         margin: 1rem 0;
+        grid-auto-rows: 1fr;
+        align-items: stretch;
     }
     @media (max-width: 768px) {
         .metrics-grid {
@@ -159,32 +200,52 @@ st.markdown("""
     }
     .metric-card {
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        padding: 1.2rem 1rem;
-        border-radius: 14px;
+        padding: 1.1rem 1rem;
+        border-radius: 12px;
         color: white;
-        text-align: center;
         box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
         transition: transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 108px;
+        height: 100%;
+        overflow: hidden;
     }
-    .metric-card:hover {
-        transform: translateY(-2px);
-    }
+    .metric-card:hover { transform: translateY(-2px); }
     .metric-card.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25); }
-    .metric-card.cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.25); }
-    .metric-card.pink { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); box-shadow: 0 4px 20px rgba(236, 72, 153, 0.25); }
+    .metric-card.cyan  { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.25); }
+    .metric-card.pink  { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); box-shadow: 0 4px 20px rgba(236, 72, 153, 0.25); }
     .metric-card.amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); }
+    .metric-value-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        line-height: 1.1;
+    }
     .metric-value {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
         font-weight: 800;
         line-height: 1.1;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+    .metric-trend {
+        font-size: 0.9rem;
+        opacity: 0.85;
+        line-height: 1;
     }
     .metric-label {
         font-size: 0.72rem;
         opacity: 0.9;
-        margin-top: 0.3rem;
+        margin-top: 0.4rem;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.03em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Answer card */
@@ -208,7 +269,7 @@ st.markdown("""
     }
     .answer-text {
         font-size: 1.05rem;
-        line-height: 1.7;
+        line-height: 1.75;
         color: #1e293b;
     }
 
@@ -216,16 +277,23 @@ st.markdown("""
     .source-card {
         background: white;
         border: 1px solid #e2e8f0;
+        border-left: 4px solid #cbd5e1;
         border-radius: 12px;
-        padding: 1.2rem 1.5rem;
+        padding: 1.15rem 1.4rem;
         margin: 0.7rem 0;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         transition: all 0.2s;
     }
+    .source-card.tier-high   { border-left-color: #10b981; }
+    .source-card.tier-medium { border-left-color: #f59e0b; }
+    .source-card.tier-low    { border-left-color: #ef4444; }
     .source-card:hover {
         border-color: #6366f1;
         box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
     }
+    .source-card.tier-high:hover   { border-left-color: #10b981; }
+    .source-card.tier-medium:hover { border-left-color: #f59e0b; }
+    .source-card.tier-low:hover    { border-left-color: #ef4444; }
     .source-header {
         display: flex;
         justify-content: space-between;
@@ -245,13 +313,13 @@ st.markdown("""
         font-weight: 700;
         color: white;
     }
-    .score-high { background: linear-gradient(135deg, #10b981, #059669); }
+    .score-high   { background: linear-gradient(135deg, #10b981, #059669); }
     .score-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .score-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .score-low    { background: linear-gradient(135deg, #ef4444, #dc2626); }
     .source-content {
-        color: #475569;
-        font-size: 0.88rem;
-        line-height: 1.6;
+        color: #334155;
+        font-size: 0.96rem;
+        line-height: 1.75;
         margin: 0.5rem 0;
     }
     .source-meta {
@@ -271,17 +339,17 @@ st.markdown("""
     .section-icon {
         width: 36px;
         height: 36px;
-        border-radius: 10px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.1rem;
     }
     .section-icon.purple { background: #ede9fe; }
-    .section-icon.green { background: #d1fae5; }
-    .section-icon.blue { background: #dbeafe; }
-    .section-icon.pink { background: #fce7f3; }
-    .section-icon.amber { background: #fef3c7; }
+    .section-icon.green  { background: #d1fae5; }
+    .section-icon.blue   { background: #dbeafe; }
+    .section-icon.pink   { background: #fce7f3; }
+    .section-icon.amber  { background: #fef3c7; }
     .section-title {
         font-size: 1.3rem;
         font-weight: 700;
@@ -345,13 +413,14 @@ st.markdown("""
     }
     .footer-link:hover { text-decoration: underline; }
 
-    /* Sidebar styling */
+    /* Sidebar styling — accent left border on config cards */
     .sidebar-section {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 0.8rem 0;
+        border-left: 4px solid #6366f1;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        margin: 0.7rem 0;
     }
     .sidebar-label {
         font-size: 0.72rem;
@@ -364,6 +433,63 @@ st.markdown("""
     .sidebar-value {
         font-size: 0.88rem;
         font-weight: 500;
+        color: #1e293b;
+        line-height: 1.5;
+    }
+
+    /* Sidebar status pill */
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+    }
+    .status-pill .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .status-pill.ready {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+    }
+    .status-pill.ready .status-dot {
+        background: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    }
+    .status-pill.loading {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
+    }
+    .status-pill.loading .status-dot {
+        background: #f59e0b;
+        animation: pulse-dot 1.2s ease-in-out infinite;
+    }
+    .status-pill.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+    .status-pill.error .status-dot { background: #ef4444; }
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%      { opacity: 0.4; transform: scale(0.85); }
+    }
+    .status-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin: 0.5rem 0 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 600;
         color: #1e293b;
     }
 
@@ -382,11 +508,40 @@ st.markdown("""
 
     /* Sample question buttons */
     .stButton > button {
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         font-size: 0.82rem !important;
         padding: 0.5rem 1rem !important;
         font-weight: 500 !important;
     }
+
+    /* Pill-style tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.4rem;
+        background: #f1f5f9;
+        padding: 0.35rem;
+        border-radius: 12px;
+        border-bottom: none !important;
+    }
+    .stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"] {
+        border-radius: 12px !important;
+        padding: 0.5rem 1rem !important;
+        background: transparent !important;
+        color: #475569 !important;
+        font-weight: 600 !important;
+        border: none !important;
+        transition: all 0.2s;
+    }
+    .stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"]:hover {
+        color: #6366f1 !important;
+        background: rgba(99, 102, 241, 0.08) !important;
+    }
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background: white !important;
+        color: #6366f1 !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+    .stTabs [data-baseweb="tab-highlight"],
+    .stTabs [data-baseweb="tab-border"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -408,6 +563,17 @@ def ingest_documents(_pipeline):
     """Ingest documents (cached - only runs once)."""
     num_chunks = _pipeline.ingest_documents("data/raw/")
     return num_chunks
+
+
+def score_tier(score: float) -> str:
+    """Map a score to a visual tier class: high (>0.5), medium (0.2–0.5), low (<0.2)."""
+    if score is None:
+        return "tier-low"
+    if score > 0.5:
+        return "tier-high"
+    if score >= 0.2:
+        return "tier-medium"
+    return "tier-low"
 
 
 def get_detailed_retrieval(pipeline, query):
@@ -528,6 +694,15 @@ with st.sidebar:
 
     st.markdown("---")
 
+    # Show a loading pill while the pipeline initialises, then swap to ready/error.
+    status_slot = st.empty()
+    status_slot.markdown(
+        '<div class="status-row">Pipeline status'
+        '<span class="status-pill loading"><span class="status-dot"></span>Loading</span>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
     # Initialize pipeline
     with st.spinner("Initializing pipeline..."):
         try:
@@ -535,11 +710,22 @@ with st.sidebar:
             num_chunks = ingest_documents(pipeline)
             stats = pipeline.get_pipeline_stats()
             doc_count = stats.get("vector_store", {}).get("document_count", 0)
-            st.success(f"Pipeline ready")
+            status_slot.markdown(
+                '<div class="status-row">Pipeline ready'
+                '<span class="status-pill ready"><span class="status-dot"></span>Ready</span>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
             col_a, col_b = st.columns(2)
             col_a.metric("Chunks", num_chunks)
             col_b.metric("Documents", doc_count)
         except Exception as e:
+            status_slot.markdown(
+                '<div class="status-row">Pipeline status'
+                '<span class="status-pill error"><span class="status-dot"></span>Error</span>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
             st.error(f"Pipeline error: {str(e)[:80]}")
             pipeline = None
 
@@ -699,12 +885,23 @@ if search_clicked and query and pipeline:
     </div>
     """, unsafe_allow_html=True)
 
+    # Median timing = simple baseline for a trend arrow (▲ slower / ▼ faster).
+    median_time = float(np.median(step_times)) if step_times else 0.0
     metrics_html = '<div class="metrics-grid">'
-    for i, (name, t, color) in enumerate(zip(step_names, step_times, colors)):
+    for name, t, color in zip(step_names, step_times, colors):
+        if t > median_time * 1.15:
+            arrow = "▲"
+        elif t < median_time * 0.85:
+            arrow = "▼"
+        else:
+            arrow = "▶"
         metrics_html += f"""
         <div class="metric-card {color}">
-            <div class="metric-value">{t:.3f}s</div>
-            <div class="metric-label">{name}</div>
+            <div class="metric-value-row">
+                <span class="metric-trend">{arrow}</span>
+                <span class="metric-value">{t:.3f}s</span>
+            </div>
+            <div class="metric-label" title="{name}">{name}</div>
         </div>"""
     metrics_html += '</div>'
     st.markdown(metrics_html, unsafe_allow_html=True)
@@ -738,10 +935,11 @@ if search_clicked and query and pipeline:
         if results["fused_results"]:
             for i, result in enumerate(results["fused_results"][:5]):
                 score = result.get("score", 0)
-                score_class = "score-high" if score > 0.5 else "score-medium" if score > 0.2 else "score-low"
+                score_class = "score-high" if score > 0.5 else "score-medium" if score >= 0.2 else "score-low"
+                tier_class = score_tier(score)
 
                 st.markdown(f"""
-                <div class="source-card">
+                <div class="source-card {tier_class}">
                     <div class="source-header">
                         <span class="source-rank">#{i+1}</span>
                         <span class="score-badge {score_class}">RRF: {score:.4f}</span>
@@ -766,8 +964,9 @@ if search_clicked and query and pipeline:
             st.bar_chart(chart_df.set_index("Document"), color="#6366f1")
 
             for i, result in enumerate(results["dense_results"][:5]):
+                tier_class = score_tier(result["score"])
                 st.markdown(f"""
-                <div class="source-card">
+                <div class="source-card {tier_class}">
                     <div class="source-header">
                         <span class="source-rank">#{i+1}</span>
                         <span class="score-badge score-high">Sim: {result['score']:.4f}</span>
@@ -787,9 +986,13 @@ if search_clicked and query and pipeline:
             })
             st.bar_chart(chart_df.set_index("Document"), color="#ec4899")
 
+            # Normalise BM25 to a 0–1 tier band for consistent visual coding.
+            max_bm25 = max(sparse_scores) if sparse_scores else 1.0
             for i, result in enumerate(results["sparse_results"][:5]):
+                normalised = (result["score"] / max_bm25) if max_bm25 else 0.0
+                tier_class = score_tier(normalised)
                 st.markdown(f"""
-                <div class="source-card">
+                <div class="source-card {tier_class}">
                     <div class="source-header">
                         <span class="source-rank">#{i+1}</span>
                         <span class="score-badge score-medium">BM25: {result['score']:.2f}</span>

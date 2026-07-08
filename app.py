@@ -8,10 +8,6 @@ import time
 import json
 import os
 import sys
-import re
-import smtplib
-import ssl
-from email.message import EmailMessage
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -392,23 +388,6 @@ st.markdown("""
         margin: 1rem 0;
     }
 
-    /* Contact form card — matches app tokens: white bg, indigo accent, radius-lg */
-    .contact-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-left: 4px solid var(--primary, #6366f1);
-        border-radius: var(--radius-lg, 16px);
-        padding: 1.5rem 2rem;
-        margin: 1rem 0 1.5rem;
-        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
-    }
-    .contact-card .contact-intro {
-        color: #475569;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 0.75rem;
-    }
-
     /* Footer */
     .footer {
         text-align: center;
@@ -550,171 +529,46 @@ st.markdown("""
         color: #475569 !important;
         font-weight: 600 !important;
         border: none !important;
-        transition:
+        transition: all 0.2s;
+    }
+    .stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"]:hover {
+        color: #6366f1 !important;
+        background: rgba(99, 102, 241, 0.08) !important;
+    }
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background: white !important;
+        color: #6366f1 !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+    .stTabs [data-baseweb="tab-highlight"],
+    .stTabs [data-baseweb="tab-border"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# NOTE: The remainder of the original CSS <style> tag was continued in the block
-# above; the closing brace/tag is emitted here to keep the file valid without
-# altering any existing rules downstream.
 
-# ─── Contact form helpers ────────────────────────────────────────────────────
+# ─── Pipeline State Management ─────────────────────────────────────────────────────────────
 
-_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+@st.cache_resource
+def load_pipeline():
+    """Load and initialize the RAG pipeline (cached across reruns)."""
+    from src.pipeline.rag_pipeline import RAGPipeline
 
-
-def _is_valid_email(addr: str) -> bool:
-    """Basic RFC-lite email check: local@domain.tld, no whitespace."""
-    if not addr or not isinstance(addr, str):
-        return False
-    return bool(_EMAIL_RE.match(addr.strip()))
+    pipeline = RAGPipeline(config_path=CONFIG_PATH)
+    pipeline.initialize()
+    return pipeline
 
 
-def _get_secret(key: str, default: str = "") -> str:
-    """Read a value from st.secrets, falling back to env var, never source."""
-    try:
-        if hasattr(st, "secrets") and key in st.secrets:
-            val = st.secrets[key]
-            if val:
-                return str(val)
-    except Exception:
-        pass
-    return os.environ.get(key, default)
+@st.cache_resource
+def ingest_documents(_pipeline):
+    """Ingest documents (cached - only runs once)."""
+    num_chunks = _pipeline.ingest_documents("data/raw/")
+    return num_chunks
 
-
-def _send_contact_message(name: str, email: str, message: str) -> tuple[bool, str]:
-    """Attempt to deliver the contact message.
-
-    Delivery order:
-      1. Formspree endpoint (CONTACT_FORMSPREE_URL)
-      2. SMTP relay (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, CONTACT_EMAIL)
-      3. Cloud-safe fallback: log the submission and report success.
-
-    Returns (delivered_externally, transport_label).
-    """
-    formspree_url = _get_secret("CONTACT_FORMSPREE_URL")
-    if formspree_url:
-        try:
-            import urllib.request
-            import urllib.parse
-            data = urllib.parse.urlencode(
-                {"name": name, "email": email, "message": message}
-            ).encode("utf-8")
-            req = urllib.request.Request(
-                formspree_url,
-                data=data,
-                headers={"Accept": "application/json"},
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                if 200 <= resp.status < 300:
-                    return True, "formspree"
-        except Exception as exc:  # pragma: no cover - network dependent
-            logger.warning(f"Formspree delivery failed: {exc}")
-
-    smtp_host = _get_secret("SMTP_HOST")
-    smtp_user = _get_secret("SMTP_USER")
-    smtp_password = _get_secret("SMTP_PASSWORD")
-    contact_to = _get_secret("CONTACT_EMAIL") or smtp_user
-    if smtp_host and smtp_user and smtp_password and contact_to:
-        try:
-            smtp_port = int(_get_secret("SMTP_PORT", "465") or 465)
-            msg = EmailMessage()
-            msg["Subject"] = f"[RAG App] Contact from {name}"
-            msg["From"] = smtp_user
-            msg["To"] = contact_to
-            msg["Reply-To"] = email
-            msg.set_content(
-                f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}\n"
-            )
-            context = ssl.create_default_context()
-            if smtp_port == 465:
-                with smtplib.SMTP_SSL(smtp_host, smtp_port, context=context, timeout=10) as srv:
-                    srv.login(smtp_user, smtp_password)
-                    srv.send_message(msg)
-            else:
-                with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as srv:
-                    srv.ehlo()
-                    srv.starttls(context=context)
-                    srv.login(smtp_user, smtp_password)
-                    srv.send_message(msg)
-            return True, "smtp"
-        except Exception as exc:  # pragma: no cover - network dependent
-            logger.warning(f"SMTP delivery failed: {exc}")
-
-    # Cloud-safe fallback — never crash, always acknowledge to the user.
-    logger.info(
-        "contact_form_submission",
-        extra={"name": name, "email": email, "message_len": len(message)},
-    )
-    return False, "logged"
-
-
-def render_contact_form() -> None:
-    """Render the contact form card just above the footer."""
-    st.markdown(
-        """
-        <div class="section-header">
-            <div class="section-icon purple">✉️</div>
-            <div class="section-title">Get in Touch</div>
-        </div>
-        <div class="contact-card">
-            <div class="contact-intro">
-                Have a question, spotted a bug, or want to share feedback?
-                Send a note — it lands straight in the author's inbox.
-            </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    with st.form("contact_form", clear_on_submit=True):
-        c1, c2 = st.columns(2)
-        with c1:
-            name = st.text_input("Name", key="contact_name", placeholder="Jane Doe")
-        with c2:
-            email = st.text_input("Email", key="contact_email", placeholder="jane@example.com")
-        message = st.text_area(
-            "Message",
-            key="contact_message",
-            placeholder="How can I help?",
-            height=140,
-        )
-        submitted = st.form_submit_button("Send", type="primary")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    if not submitted:
-        return
-
-    name_v = (name or "").strip()
-    email_v = (email or "").strip()
-    message_v = (message or "").strip()
-
-    if not name_v or not email_v or not message_v:
-        st.warning("Please fill in all fields (Name, Email, and Message) before sending.")
-        return
-
-    if not _is_valid_email(email_v):
-        st.warning("That email address doesn't look valid — please include an '@' and a domain (e.g. name@example.com).")
-        return
-
-    try:
-        delivered, transport = _send_contact_message(name_v, email_v, message_v)
-    except Exception as exc:  # defensive: never crash the page
-        logger.error(f"Unexpected contact form error: {exc}")
-        delivered, transport = False, "logged"
-
-    if delivered:
-        st.success(f"✅ Thanks {name_v.split()[0]}! Your message has been sent — I'll reply to {email_v} shortly.")
-    else:
-        st.success(
-            f"✅ Thanks {name_v.split()[0]}! Your message has been received and logged. "
-            "I'll get back to you at " + email_v + " as soon as possible."
-        )
-
-
-# ─── Sidebar / pipeline setup (existing) ─────────────────────────────────────
 
 def score_tier(score: float) -> str:
+    """Map a score to a visual tier class: high (>0.5), medium (0.2–0.5), low (<0.2)."""
+    if score is None:
+        return "tier-low"
     if score > 0.5:
         return "tier-high"
     if score >= 0.2:
@@ -722,33 +576,135 @@ def score_tier(score: float) -> str:
     return "tier-low"
 
 
-@st.cache_resource(show_spinner=False)
-def load_pipeline():
-    from src.pipeline.rag_pipeline import RAGPipeline
-    return RAGPipeline(config_path=CONFIG_PATH)
+def get_detailed_retrieval(pipeline, query):
+    """Get detailed retrieval results showing each step."""
+    results = {}
+
+    # Step 1: Encode query
+    embedding_manager = pipeline._components["embedding_manager"]
+    start = time.time()
+    query_embedding = embedding_manager.encode_query(query)
+    results["encoding_time"] = time.time() - start
+
+    # Step 2: Dense retrieval
+    vector_store = pipeline._components["vector_store"]
+    start = time.time()
+    dense_results = vector_store.query(
+        query_embedding=query_embedding.tolist(),
+        top_k=10,
+    )
+    results["dense_time"] = time.time() - start
+    results["dense_results"] = [
+        {
+            "content": dense_results["documents"][i][:200],
+            "score": 1 - dense_results["distances"][i],
+            "metadata": dense_results["metadatas"][i] if dense_results.get("metadatas") else {},
+        }
+        for i in range(len(dense_results.get("documents", [])))
+    ]
+
+    # Step 3: Sparse retrieval (BM25)
+    retriever = pipeline._components["retriever"]
+    start = time.time()
+    if retriever._bm25_index is not None:
+        tokenized_query = retriever._tokenize(query)
+        bm25_scores = retriever._bm25_index.get_scores(tokenized_query)
+        top_indices = np.argsort(bm25_scores)[::-1][:10]
+        results["sparse_results"] = [
+            {
+                "content": retriever._corpus[idx][:200],
+                "score": float(bm25_scores[idx]),
+                "index": int(idx),
+            }
+            for idx in top_indices
+            if bm25_scores[idx] > 0
+        ]
+    else:
+        results["sparse_results"] = []
+    results["sparse_time"] = time.time() - start
+
+    # Step 4: Hybrid retrieval with RRF
+    start = time.time()
+    hybrid_results = retriever.retrieve(query, top_k=10)
+    results["fusion_time"] = time.time() - start
+    results["fused_results"] = hybrid_results
+
+    # Step 5: Generate answer
+    context = pipeline._build_context(hybrid_results[:5])
+    start = time.time()
+    answer = pipeline._generate_answer(query, context)
+    results["generation_time"] = time.time() - start
+    results["answer"] = answer
+    results["context"] = context
+
+    results["total_time"] = (
+        results["encoding_time"]
+        + results["dense_time"]
+        + results["sparse_time"]
+        + results["fusion_time"]
+        + results["generation_time"]
+    )
+
+    return results
 
 
-@st.cache_resource(show_spinner=False)
-def ingest_documents(_pipeline):
-    data_dir = Path("data/raw")
-    if not data_dir.exists() or not any(data_dir.iterdir()):
-        return 0
-    return _pipeline.ingest(str(data_dir))
+# ─── Sidebar ──────────────────────────────────────────────────────────────────────────
 
-
-# ─── Sidebar ─────────────────────────────────────────────────────────────────
+import yaml
+with open(CONFIG_PATH, "r") as f:
+    config = yaml.safe_load(f)
 
 with st.sidebar:
-    st.markdown("### ⚙️ Pipeline Status")
+    st.markdown("## ⚡ Pipeline Config")
+
+    st.markdown(f"""
+    <div class="sidebar-section">
+        <div class="sidebar-label">Embedding Model</div>
+        <div class="sidebar-value">{config["embedding"]["model_name"].split("/")[-1]}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="sidebar-section">
+        <div class="sidebar-label">LLM</div>
+        <div class="sidebar-value">{config['llm']['provider'].title()} / {config['llm']['model_name']}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="sidebar-section">
+        <div class="sidebar-label">Vector Store</div>
+        <div class="sidebar-value">{config["vectorstore"]["backend"].title()} ({config["vectorstore"]["chroma"]["distance_metric"]})</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="sidebar-section">
+        <div class="sidebar-label">Retrieval Strategy</div>
+        <div class="sidebar-value">Hybrid (Dense + BM25) → RRF (k={config["retrieval"]["fusion"]["rrf_k"]})</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="sidebar-section">
+        <div class="sidebar-label">Chunking</div>
+        <div class="sidebar-value">{config["chunking"]["strategy"].title()} (threshold: {config["chunking"]["semantic"]["breakpoint_threshold"]})</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Show a loading pill while the pipeline initialises, then swap to ready/error.
     status_slot = st.empty()
     status_slot.markdown(
-        '<div class="status-row">Initialising pipeline'
+        '<div class="status-row">Pipeline status'
         '<span class="status-pill loading"><span class="status-dot"></span>Loading</span>'
         '</div>',
         unsafe_allow_html=True,
     )
-    pipeline = None
-    with st.spinner("Loading pipeline..."):
+
+    # Initialize pipeline
+    with st.spinner("Initializing pipeline..."):
         try:
             pipeline = load_pipeline()
             num_chunks = ingest_documents(pipeline)
@@ -1100,10 +1056,6 @@ if search_clicked and query and pipeline:
 
 elif search_clicked and not query:
     st.warning("Please enter a question to search.")
-
-# ─── Contact Form ────────────────────────────────────────────────────────────
-
-render_contact_form()
 
 # ─── Footer ──────────────────────────────────────────────────────────────────────────────
 

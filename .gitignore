@@ -1,29 +1,81 @@
-# Streamlit secrets — NEVER commit real credentials
-.streamlit/secrets.toml
-
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
 .Python
 build/
+develop-eggs/
 dist/
-*.egg-info/
+downloads/
+eggs/
 .eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
 *.egg
 
-# Virtual environments
-.venv/
-venv/
-env/
-.env
+# PyInstaller
+*.manifest
+*.spec
 
-# Coverage / test artefacts
-.coverage
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
 htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
 .pytest_cache/
-*.xml
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Secrets
+.streamlit/secrets.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+data/vectorstore/
+data/processed/
+models/
+logs/
+results/
+*.log
+
+# Large model files
+*.bin
+*.pt
+*.pth
+*.onnx
+*.safetensors
 
 # Jupyter
 .ipynb_checkpoints/

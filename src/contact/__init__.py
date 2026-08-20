@@ -1,11 +1,13 @@
-"""Contact form handling module.
+"""Contact form submission handling."""
 
-The concrete delivery handler (SMTP / email service / webhook) is
-implemented in Story 2. This stub provides a stable import path that the
-Streamlit UI can call today; Story 2 will replace the body of
-``handle_contact_submission`` without touching ``app.py``.
-"""
+from src.contact.handler import (
+    ContactSubmissionError,
+    handle_contact_submission,
+    is_valid_email,
+)
 
-from src.contact.handler import handle_contact_submission
-
-__all__ = ["handle_contact_submission"]
+__all__ = [
+    "ContactSubmissionError",
+    "handle_contact_submission",
+    "is_valid_email",
+]

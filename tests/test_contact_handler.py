@@ -1,4 +1,6 @@
-"""Tests for the contact submission handler stub (Story 1)."""
+"""Tests for the contact submission handler."""
+
+import json
 
 import pytest
 
@@ -42,16 +44,35 @@ def test_is_valid_email_rejects_bad_addresses(email):
 
 # ─── Handler contract ────────────────────────────────────────────────────────
 
-def test_handler_accepts_valid_payload():
-    # Stub returns None on success; real delivery comes in Story 2.
+def test_handler_accepts_valid_payload(tmp_path):
+    log_file = tmp_path / "contacts.log"
     assert (
         handle_contact_submission(
             "Jane Doe",
             "jane@example.com",
             "Great pipeline demo! Can we collaborate?",
+            log_path=log_file,
         )
         is None
     )
+    # Persisted as a single JSON line with all three fields.
+    lines = log_file.read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 1
+    entry = json.loads(lines[0])
+    assert entry["name"] == "Jane Doe"
+    assert entry["email"] == "jane@example.com"
+    assert entry["message"].startswith("Great pipeline demo!")
+    assert "timestamp" in entry
+
+
+def test_handler_appends_multiple_entries(tmp_path):
+    log_file = tmp_path / "contacts.log"
+    handle_contact_submission("A", "a@b.co", "one", log_path=log_file)
+    handle_contact_submission("B", "b@c.co", "two", log_path=log_file)
+    lines = log_file.read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 2
+    assert json.loads(lines[0])["name"] == "A"
+    assert json.loads(lines[1])["name"] == "B"
 
 
 @pytest.mark.parametrize(
@@ -63,9 +84,12 @@ def test_handler_accepts_valid_payload():
         {"name": "Jane", "email": "j@e.com", "message": "   "},
     ],
 )
-def test_handler_rejects_invalid_payloads(payload):
+def test_handler_rejects_invalid_payloads(payload, tmp_path):
+    log_file = tmp_path / "contacts.log"
     with pytest.raises(ValueError):
-        handle_contact_submission(**payload)
+        handle_contact_submission(log_path=log_file, **payload)
+    # Nothing should be written for rejected submissions.
+    assert not log_file.exists() or log_file.read_text() == ""
 
 
 def test_contact_submission_error_is_runtime_error():

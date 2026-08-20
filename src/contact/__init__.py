@@ -1,5 +1,11 @@
-"""Contact form module for the Streamlit app."""
+"""Contact form handling module.
 
-from src.contact.contact_form import render_contact_form, validate_submission, save_submission
+The concrete delivery handler (SMTP / email service / webhook) is
+implemented in Story 2. This stub provides a stable import path that the
+Streamlit UI can call today; Story 2 will replace the body of
+``handle_contact_submission`` without touching ``app.py``.
+"""
 
-__all__ = ["render_contact_form", "validate_submission", "save_submission"]
+from src.contact.handler import handle_contact_submission
+
+__all__ = ["handle_contact_submission"]

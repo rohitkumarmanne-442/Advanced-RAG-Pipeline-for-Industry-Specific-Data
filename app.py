@@ -737,6 +737,11 @@ with st.sidebar:
         st.caption("🖥️ Local mode (Ollama)")
 
 
+# ─── Theme toggle (dark / light) ──────────────────────────────────────────────
+from src.ui.theme import render_theme_toggle  # noqa: E402
+
+render_theme_toggle()
+
 # ─── Hero Section ─────────────────────────────────────────────────────────────────────────
 
 st.markdown("""

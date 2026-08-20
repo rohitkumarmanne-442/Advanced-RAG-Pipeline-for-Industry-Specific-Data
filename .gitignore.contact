@@ -1,0 +1,5 @@
+# The contact form writes submissions to ./contacts.log at runtime.
+# Add the following line to your .gitignore to keep submissions out of git:
+#
+#     contacts.log
+#

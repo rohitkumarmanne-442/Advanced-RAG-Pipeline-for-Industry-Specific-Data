@@ -1057,6 +1057,14 @@ if search_clicked and query and pipeline:
 elif search_clicked and not query:
     st.warning("Please enter a question to search.")
 
+# ─── Contact Form ────────────────────────────────────────────────────────────────────────
+
+try:
+    from src.contact.ui import render_contact_form
+    render_contact_form()
+except Exception as _contact_exc:  # pragma: no cover - defensive: never break the page
+    st.warning(f"Contact form unavailable: {_contact_exc}")
+
 # ─── Footer ──────────────────────────────────────────────────────────────────────────────
 
 st.markdown("""

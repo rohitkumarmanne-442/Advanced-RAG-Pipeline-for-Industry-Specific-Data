@@ -251,14 +251,6 @@ streamlit run app.py
 GROQ_API_KEY=gsk_your_key streamlit run app.py
 ```
 
-## Resume Bullet Points
-
-> "Engineered a production-grade RAG pipeline processing SEC financial filings with semantic chunking, embedding fine-tuning, and hybrid retrieval using Reciprocal Rank Fusion — achieving 95% accuracy against a verified ground-truth dataset with <5% hallucination rate."
-
-> "Optimized vector retrieval combining dense (BGE-large) and sparse (BM25) search with cross-encoder reranking, improving context precision by 23% over baseline dense-only retrieval."
-
-> "Implemented domain-specific embedding fine-tuning using contrastive learning (MNRL loss) on financial terminology, reducing retrieval failures on specialized queries by 40%."
-
 ## License
 
 MIT

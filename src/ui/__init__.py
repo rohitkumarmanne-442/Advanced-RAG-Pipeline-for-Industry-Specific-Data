@@ -1,1 +1,1 @@
-"""UI helper modules for the Streamlit app."""
+"""UI helpers for the Streamlit app."""

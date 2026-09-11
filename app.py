@@ -1062,11 +1062,6 @@ if search_clicked and query and pipeline:
 elif search_clicked and not query:
     st.warning("Please enter a question to search.")
 
-# ─── Contact Form ────────────────────────────────────────────────────────────
-from src.ui.contact import render_contact_form  # noqa: E402
-
-render_contact_form()
-
 # ─── Footer ──────────────────────────────────────────────────────────────────────────────
 
 st.markdown("""
